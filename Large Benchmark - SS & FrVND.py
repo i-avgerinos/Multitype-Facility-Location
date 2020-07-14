@@ -112,7 +112,7 @@ for j in range(num_locations):
 
 facility_cap = []
 for l in range(num_types):
-	facility_cap.append(random.Random(l).randint(1500, 3000))
+	facility_cap.append(random.Random(l).randint(100, 500))
 
 ######### SingleStage Algorithm ###################################################################
 print("Searching for an upper bound . . . . . . .")
