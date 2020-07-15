@@ -713,19 +713,18 @@ for j in range(num_locations):
 	values.append(location_vol[j])
 	vars.append("v"+str(j+1))
 
-#################################################################################################################
+######### MIP Formulation ######################################################################################
 model = cplex.Cplex()
 #model.set_results_stream(None)
 model.parameters.workdir.set("/home/avgerinosi/NodeFiles")
 model.parameters.workmem.set(4096)
 model.parameters.mip.strategy.file.set(2)
-#model.parameters.mip.tolerances.mipgap.set(0.1)
+model.parameters.mip.tolerances.mipgap.set(0.1) #MIP terminates if the 10% Gap is reached
 model.parameters.mip.limits.repairtries.set(50)
 
 
-############ 1. Define variables ################################################################################################
 start_model = time.time()
-############ 1.1. dj variable #####################################################################
+############ dj variable #####################################################################
 dj = []
 for j in range(num_locations):
 	dj.append("d" + str(j))
@@ -738,7 +737,7 @@ for j in range(num_locations):
 		      names = [dj[j]])
 ###################################################################################################
 
-############ 1.2. Yjln variable ###################################################################
+############ Yjln variable ###################################################################
 Yjln = []
 for j in range(num_locations):
 	Yjln.append([])
@@ -756,7 +755,7 @@ for j in range(num_locations):
 			      	types = ["B"],
 			      	names = [Yjln[j][l][n]])
 
-############ 1.5. Zjpm variable ###################################################################
+############ Zjpm variable ###################################################################
 Zjcm = []
 for j in range(num_locations):
 	Zjcm.append([])
@@ -777,7 +776,7 @@ for j in range(num_locations):
 		  		types = ["B"],
 		  		names = [Zjcm[j][c][l][m]])
 
-############ 1.3. Xipm variable ###################################################################
+############ Xipm variable ###################################################################
 Xicm = []
 for i in range(num_clients):
 	Xicm.append([])
@@ -799,7 +798,7 @@ for i in range(num_clients):
 			  	names = [Xicm[i][c][l][m]])
 ###################################################################################################
 
-############ 1.4. tij variable ####################################################################
+############ tij variable ####################################################################
 tij = []
 for i in range(num_clients):
 	tij.append([])
@@ -825,12 +824,12 @@ for j in range(num_locations):
 						ub = [cplex.infinity],
 						names = [dummy[j]])
 #################################################################################################################################
-indices = model.MIP_starts.add([vars, values], model.MIP_starts.effort_level.check_feasibility)
+indices = model.MIP_starts.add([vars, values], model.MIP_starts.effort_level.check_feasibility) #The upper bound solution is used.
 ############ 2. Set constraints #################################################################################################
 linear_expressions = []
 all_senses = []
 all_rhs = []
-############ 2.1. Every client has to be assigned. ################################################
+############ Every client has to be assigned. ################################################
 for i in range(num_clients):        
     constraint_1 = cplex.SparsePair(ind = [Xicm[i][c][l][m] for c, l, m in itertools.product(list(range(num_copies)), list(range(num_types)), list(range(num_bands)))],
       val = [1.0] * num_copies * num_types * num_bands)
@@ -840,7 +839,7 @@ for i in range(num_clients):
 
 ###################################################################################################
 
-############ 2.2. Set the proper band based on upper bound ########################################
+############ Set the proper band based on upper bound ########################################
 for c in range(num_copies):
 	for l in range(num_types):
 		for m in range(num_bands):       
@@ -851,7 +850,7 @@ for c in range(num_copies):
 			all_rhs.append(0.0)
 ###################################################################################################
 
-############ 2.3. Set the proper band based on lower bound ########################################
+############ et the proper band based on lower bound ########################################
 for c in range(num_copies):
 	for l in range(num_types):
 		for m in range(num_bands):       
@@ -862,7 +861,7 @@ for c in range(num_copies):
 			all_rhs.append(0.0)
 ###################################################################################################
 
-############ 2.4. Every unit is located to a single location ######################################
+############ Every unit is located to a single location ######################################
 for j in range(num_locations):
 	for l in range(num_types):
 		constraint_5 = cplex.SparsePair(ind = [Yjln[j][l][n] for n in range(num_copies)],
@@ -873,7 +872,7 @@ for j in range(num_locations):
 
 ###################################################################################################
 
-############ 2.5. Define the number of n in j and l ###############################################
+############ Define the number of n in j and l ###############################################
 for j in range(num_locations):
 	for l in range(num_types):
 		constraint_5 = cplex.SparsePair(ind = [Zjcm[j][c][l][m] for c, m in itertools.product(list(range(num_copies)), list(range(num_bands)))] + [Yjln[j][l][n] for n in range(num_copies)],
@@ -882,20 +881,8 @@ for j in range(num_locations):
 		all_senses.append("L")
 		all_rhs.append(0.0)
 
-###################################################################################################
 
-############ 2.6. dj = 1 if the location j is chosen ##############################################
-#for j in range(num_locations):
-#	for c in range(num_copies):
-#		for l in range(num_types):
-#			constraint_6 = cplex.SparsePair(ind = [dj[j]] + [Zjcm[j][c][l][m] for m in range(num_bands)],
-#											val = [1.0] + [-1.0] * num_bands)
-#			model.linear_constraints.add(lin_expr = [constraint_6],
-#										senses = ["G"],
-#										rhs = [0.0])
-###################################################################################################
-
-############ 2.7. Every unit is assigned to a single band #########################################
+############ Every unit is assigned to a single band #########################################
 for c in range(num_copies):
 	for l in range(num_types):
 		for j in range(num_locations):
@@ -908,7 +895,7 @@ for c in range(num_copies):
 ###################################################################################################
 
 
-############ 2.8. Set the tij variable. ###########################################################
+############ Set the tij variable. ###########################################################
 for j in range(num_locations):
 	for i in range(num_clients):
 		for c in range(num_copies):
@@ -921,7 +908,7 @@ for j in range(num_locations):
 
 ###################################################################################################
 
-############ 2.9. Each facility can be assigned to one and only band ##############################
+############ Each facility can be assigned to one and only band ##############################
 for c in range(num_copies):
 	for l in range(num_types):
 		constraint_11 = cplex.SparsePair(ind = [Zjcm[j][c][l][m] for j, m in itertools.product(list(range(num_locations)), list(range(num_bands)))],
@@ -937,7 +924,7 @@ for i in range(num_clients):
 	for m in range(num_bands):
 		test_list.append(demand[i])
 
-############ 2.10. The capacity constraints have to be respected ##################################
+############ The capacity constraints have to be respected ##################################
 for l in range(num_types):
 	for c in range(num_copies):
 		constraint_12 = cplex.SparsePair(ind = [Xicm[i][c][l][m] for i, m in itertools.product(list(range(num_clients)), list(range(num_bands)))],
@@ -947,23 +934,12 @@ for l in range(num_types):
 		all_rhs.append(facility_cap[l])
 
 
-#for j in range(num_locations):
-#		constraint_8 = cplex.SparsePair(ind = [tij[i][j] for i in range(num_clients)],
-#										val = [demand[i] for i in range(num_clients)])
-#		model.linear_constraints.add(lin_expr = [constraint_8],
-#									senses = ["L"],
-#									rhs = [capacity[j]])
-###################################################################################################
-
-
 for j in range(num_locations):
 	constraint_20 = cplex.SparsePair(ind = [dummy[j]] + [tij[i][j] for i in range(num_clients)],
 									val = [1.0] + [-demand[i] for i in range(num_clients)])
 	linear_expressions.append(constraint_20)
 	all_senses.append("E")
 	all_rhs.append(0.0)
-
-
 
 for j in range(num_locations):
 	constraint_21 = cplex.SparsePair(ind = [dummy[j]] + [dj[j]],
@@ -983,7 +959,7 @@ model.linear_constraints.add(lin_expr = linear_expressions,
 							rhs = all_rhs)
 
 
-############ 3. Solve the model #################################################################################################
+######### Solve MIP ############################################################################################
 model.objective.set_sense(model.objective.sense.minimize)
 model.solve()
 
@@ -1018,6 +994,114 @@ for j in range(num_locations):
 end_model = time.time()
 optimal_time = end_model - start_model
 print("ILP solution calculated (10-gap): "+str(round(cost,2))+" - in "+str(round(optimal_time,2))+" seconds")
+print("-------------------------------------------------------------------------")
+
+model.parameters.mip.tolerances.mipgap.set(0.05) #MIP terminates if the 5% Gap is reached
+model.solve()
+
+cost = 0
+fac_vol = []
+for l in range(num_types):
+	fac_vol.append([])
+	for c in range(num_copies):
+		fac_vol[l].append(0)
+for i in range(num_clients):
+	for c in range(num_copies):
+		for l in range(num_types):
+			for m in range(num_bands):
+				if model.solution.get_values(Xicm[i][c][l][m]) > 0.9:
+					fac_vol[l][c] = fac_vol[l][c] + demand[i]
+for i in range(num_clients):
+	for j in range(num_locations):
+		if model.solution.get_values(tij[i][j]) > 0.9:
+			cost = cost + transport_cost[i][j]*demand[i]
+for l in range(num_types):
+	for c in range(num_copies):
+		cost = cost + production_cost_function(fac_vol[l][c], l)
+for j in range(num_locations):
+	for l in range(num_types):
+		for n in range(num_copies):
+			if model.solution.get_values(Yjln[j][l][n]) > 0.9:
+				cost = cost + setup_cost_function(n+1, j, l)
+for j in range(num_locations):
+	if model.solution.get_values(dj[j]) > 0.9:
+		cost = cost + opening_cost[j]
+
+end_model = time.time()
+optimal_time = end_model - start_model
+print("ILP solution calculated (5-gap): "+str(round(cost,2))+" - in "+str(round(optimal_time,2))+" seconds")
+print("-------------------------------------------------------------------------")
+
+model.parameters.mip.tolerances.mipgap.set(0.02) #MIP terminates if the 2% Gap is reached
+model.solve()
+
+cost = 0
+fac_vol = []
+for l in range(num_types):
+	fac_vol.append([])
+	for c in range(num_copies):
+		fac_vol[l].append(0)
+for i in range(num_clients):
+	for c in range(num_copies):
+		for l in range(num_types):
+			for m in range(num_bands):
+				if model.solution.get_values(Xicm[i][c][l][m]) > 0.9:
+					fac_vol[l][c] = fac_vol[l][c] + demand[i]
+for i in range(num_clients):
+	for j in range(num_locations):
+		if model.solution.get_values(tij[i][j]) > 0.9:
+			cost = cost + transport_cost[i][j]*demand[i]
+for l in range(num_types):
+	for c in range(num_copies):
+		cost = cost + production_cost_function(fac_vol[l][c], l)
+for j in range(num_locations):
+	for l in range(num_types):
+		for n in range(num_copies):
+			if model.solution.get_values(Yjln[j][l][n]) > 0.9:
+				cost = cost + setup_cost_function(n+1, j, l)
+for j in range(num_locations):
+	if model.solution.get_values(dj[j]) > 0.9:
+		cost = cost + opening_cost[j]
+
+end_model = time.time()
+optimal_time = end_model - start_model
+print("ILP solution calculated (2-gap): "+str(round(cost,2))+" - in "+str(round(optimal_time,2))+" seconds")
+print("-------------------------------------------------------------------------")
+
+model.parameters.mip.tolerances.mipgap.set(0.00) #MIP terminates if the optimal solution is reached
+model.solve()
+
+cost = 0
+fac_vol = []
+for l in range(num_types):
+	fac_vol.append([])
+	for c in range(num_copies):
+		fac_vol[l].append(0)
+for i in range(num_clients):
+	for c in range(num_copies):
+		for l in range(num_types):
+			for m in range(num_bands):
+				if model.solution.get_values(Xicm[i][c][l][m]) > 0.9:
+					fac_vol[l][c] = fac_vol[l][c] + demand[i]
+for i in range(num_clients):
+	for j in range(num_locations):
+		if model.solution.get_values(tij[i][j]) > 0.9:
+			cost = cost + transport_cost[i][j]*demand[i]
+for l in range(num_types):
+	for c in range(num_copies):
+		cost = cost + production_cost_function(fac_vol[l][c], l)
+for j in range(num_locations):
+	for l in range(num_types):
+		for n in range(num_copies):
+			if model.solution.get_values(Yjln[j][l][n]) > 0.9:
+				cost = cost + setup_cost_function(n+1, j, l)
+for j in range(num_locations):
+	if model.solution.get_values(dj[j]) > 0.9:
+		cost = cost + opening_cost[j]
+
+end_model = time.time()
+optimal_time = end_model - start_model
+print("ILP solution calculated (Opt): "+str(round(cost,2))+" - in "+str(round(optimal_time,2))+" seconds")
 print("-------------------------------------------------------------------------")
 
 
