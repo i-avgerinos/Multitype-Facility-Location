@@ -16,3 +16,5 @@ TT - FR & GrVND.py:			Filtering & Rounding Algorithm and GreedyVND meta-heuristi
 TT - SS & ExVND & Opt.py:		SingleStage Algorithm, ExactVND meta-heuristic and MIP CPLEX solution on the last-mile parcel delivery datasets
 TT - SS & GrVND.py:			SingleStage Algorithm and GreedyVND meta-heuristic on the last-mile parcel delivery datasets
 -------------------------------------------------
+*Notes on using last-mile_delivery files:
+Each file contains a Clients x Weeks (105) demand matrix. The w parameter receives values between 0 to 104 (iteratively increasing as the code runs) and solves the dataset of the corresponding week. Not all weeks are solved and described in the Appendix results.
