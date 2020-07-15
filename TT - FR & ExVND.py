@@ -90,14 +90,14 @@ lb = 1
 for l in range(num_types):
 	lower_bound.append([])
 	for m in range(num_bands):
-		lower_bound[l].append(lb+m*1000000)
+		lower_bound[l].append(lb+m*300000)
 
 upper_bound = []
-ub = 1000000
+ub = 300000
 for l in range(num_types):
 	upper_bound.append([])
 	for m in range(num_bands):
-		upper_bound[l].append(ub+m*1000000)
+		upper_bound[l].append(ub+m*300000)
 
 production_cost = []
 for l in range(num_types):
