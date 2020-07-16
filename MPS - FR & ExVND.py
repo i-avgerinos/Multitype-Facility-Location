@@ -1030,7 +1030,7 @@ for s in range(len(neighborhoods)):
 											val = test_list1 + test_list2)
 			model.linear_constraints.add(lin_expr = [constraint_12],
 										senses = ["L"],
-										rhs = [lcap[neighborhoods[s][l]]])
+										rhs = [lcap[used_types[l]]])
 
 	#for i in range(len(bw_demand[0])):
 	#	for l in range(num_types):
