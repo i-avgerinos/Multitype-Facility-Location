@@ -101,7 +101,7 @@ for j in range(num_locations):
 ######### Facility capacities ##################################################################################
 facility_cap = []
 for l in range(num_types):
-	facility_cap.append(random.Random(l).randint(100, 500))
+	facility_cap.append(random.Random(l).randint(1000, 3000))
 
 ######### SingleStage Greedy Algorithm #########################################################################
 print("Searching for an upper bound . . . . . . .")
