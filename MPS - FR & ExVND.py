@@ -86,7 +86,6 @@ for l in range(num_types):
 		lower_bound[l].append(upper_bound[l][m]+1)
 
 ################ 2.3. Printers attributes #################################
-sku = ["J7Z13A","W7U02A","Z8Z00A","Z8Z04A","Z8Z06A","Z8Z10A","Z8Z12A","Z8Z14A","Z8Z20A","Z8Z22A","0293C004","0294C004","0603C005","0605C005","1403C010","1404C002","1407C002","1408C002","1492C006","1494C006","CF378A","D3Q20B","J9V82B","L3U66A","9577B004","F6W14A","6856B004","6859B004","9506B004","9507B004","0295C004","0295C010","9505B005"] #ID of printers
 buying_cost = [2696.32,676.37,1659.00,2209.82,1392.32,1969.43,3281.42,4598.96,3046.63,3954.53,6353.00,5445.00,5703.00,4591.00,2401.00,2946.00,3628.00,4625.00,3131.00,2536.00,325.74,363.72,503.68,1885.00,930.00,279.82,1242.00,1465.00,542.00,575.00,4819.00,3447.00,465.00] #Buying cost per type
 isColor = [1,0,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0] #Whether printer prints colour copies (1) or not (0)
 
@@ -761,9 +760,9 @@ while(running == True):
 	for l in range(num_types):
 		for c in range(num_copies):
 			for m in range(num_bands):
-				if assigned_demand[l][c][0] >= lower_bound[l][m] and assigned_demand[l][c][0] > upper_bound[l][m]:
+				if assigned_demand[l][c][0] >= lower_bound[l][m] and assigned_demand[l][c][0] < upper_bound[l][m]:
 					ss_service = ss_service + round(production_cost[l][0][m]*assigned_demand[l][c][0],2)
-				if assigned_demand[l][c][1] >= lower_bound[l][m] and assigned_demand[l][c][1] > upper_bound[l][m]:
+				if assigned_demand[l][c][1] >= lower_bound[l][m] and assigned_demand[l][c][1] < upper_bound[l][m]:
 					ss_service = ss_service + round(production_cost[l][1][m]*assigned_demand[l][c][1],2)
 	ss_setup = 0
 	level = []
@@ -1031,7 +1030,7 @@ for s in range(len(neighborhoods)):
 											val = test_list1 + test_list2)
 			model.linear_constraints.add(lin_expr = [constraint_12],
 										senses = ["L"],
-										rhs = [lcap[used_types[l]]])
+										rhs = [lcap[neighborhoods[s][l]]])
 
 	#for i in range(len(bw_demand[0])):
 	#	for l in range(num_types):
