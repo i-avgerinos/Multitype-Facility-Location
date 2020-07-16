@@ -1,3 +1,7 @@
+branch: master
+-------------------------------------------------
+Appendix.pdf:           A pdf file presenting the detailed results of the computational experiments
+-------------------------------------------------
 branch: benchmark_instances
 -------------------------------------------------
 FR & GrVND.py:				    Filtering & Rounding Algorithm and GreedyVND meta-heuristic on a randomly generated benchmark dataset
