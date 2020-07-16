@@ -25,6 +25,7 @@ Each file contains a Clients x Weeks (105) demand matrix. The w parameter receiv
 -------------------------------------------------
 branch: managed_printing_services
 -------------------------------------------------
-MPS - Opt.py:            MIP CPLEX solution of the Instance 1 of the MPS case
-MPS - SS & ExVND:        SingleStage Algorithm and ExactVND meta-heuristic on the Instance 1 of the MPS case
+MPS - Opt.py:            MIP CPLEX solution of Instance 1 of the MPS case
+MPS - SS & ExVND:        SingleStage Algorithm and ExactVND meta-heuristic on Instance 1 of the MPS case
+MPS - FR & ExVND:        Filtering & Rounding Algorithm and ExactVND meta-heuristic on Instance 1 of the MPS case
 -------------------------------------------------
