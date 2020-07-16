@@ -509,10 +509,8 @@ while(running == True):
 				for m in range(num_bands):
 					if bw_demand[0][i] < upper_bound[l][m] and bw_demand[0][i] >= lower_bound[l][m]:
 						metric_costs.append(round(bw_demand[0][i]*production_cost[l][0][m],2))
-						dict_costs.append([i,l,c,m])
-					else:
-						metric_costs.append(1000000)
-						dict_costs.append([i,l,c,m])
+						dict_costs.append([i,l,c])
+						break
 	metric_costs.sort()
 	dictionary = [x for _, x in sorted(zip(metric_costs, dict_costs))]
 
@@ -588,7 +586,7 @@ while(running == True):
 			assigned_demand[l].append(0)
 			for i in range(len(bw_demand[0])):
 				if assigned_clients[i] == False:
-					if any(new_Xbw[i][c][l][m] > 0.0 for m in range(num_bands)) and assigned_demand[l][c] + bw_demand[0][i] <= facility_cap[l]:
+					if any(new_Xbw[i][c][l][m] > 0.0 for m in range(num_bands)) and assigned_demand[l][c] + bw_demand[0][i] <= facility_cap[l] and assigned_demand[l][c] + bw_demand[0][i] <= 46000:
 						int_Xbw[i][c][l] = 1.0
 						assigned_clients[i] = True
 						assigned_demand[l][c] = assigned_demand[l][c] + bw_demand[0][i]
@@ -596,14 +594,14 @@ while(running == True):
 		if assigned_clients[i] == False:
 			for l in range(num_types):
 				for c in range(num_copies):
-					if assigned_demand[l][c] > 0 and assigned_demand[l][c] + bw_demand[0][i] <= facility_cap[l]:
+					if assigned_demand[l][c] > 0 and assigned_demand[l][c] + bw_demand[0][i] <= facility_cap[l] and assigned_demand[l][c] + bw_demand[0][i] <= 46000:
 						int_Xbw[i][c][l] = 1.0
 						assigned_clients[i] = True
 						assigned_demand[l][c] = assigned_demand[l][c] + bw_demand[0][i]
 		if assigned_clients[i] == False:
 			for l in range(num_types):
 				for c in range(num_copies):
-					if assigned_demand[l][c] + bw_demand[0][i] <= facility_cap[l]:
+					if assigned_demand[l][c] + bw_demand[0][i] <= facility_cap[l] and assigned_demand[l][c] + bw_demand[0][i] <= 46000:
 						int_Xbw[i][c][l] = 1.0
 						assigned_demand[l][c] = assigned_demand[l][c] + bw_demand[0][i]
 						assigned_clients[i] = True
@@ -632,10 +630,9 @@ while(running == True):
 				for m in range(num_bands):
 					if colour_demand[0][i] < upper_bound[l][m] and colour_demand[0][i] >= lower_bound[l][m]:
 						metric_costs.append(round(colour_demand[0][i]*production_cost[l][1][m],2))
-						dict_costs.append([i,l,c,m])
-					else:
-						metric_costs.append(1000000)
-						dict_costs.append([i,l,c,m])
+						dict_costs.append([i,l,c])
+						break
+
 	metric_costs.sort()
 	dictionary = [x for _, x in sorted(zip(metric_costs, dict_costs))]
 
@@ -653,7 +650,7 @@ while(running == True):
 				break
 
 	a_i = []
-	for i in range(len(colour_demand[0])):
+	for i in range(len(colour_demand[0])-1):
 		sum_x = 0
 		for l in range(num_types):
 			for c in range(num_copies):
@@ -663,7 +660,7 @@ while(running == True):
 		a_i.append(sum_x)
 
 	new_Xc = []
-	for i in range(len(colour_demand[0])):
+	for i in range(len(colour_demand[0])-1):
 		covered = False
 		new_Xc.append([])
 		for c in range(num_copies):
@@ -702,31 +699,31 @@ while(running == True):
 			for l in range(num_types):
 				int_Xc[i][c].append(0.0)
 	assigned_clients = []
-	for i in range(len(colour_demand[0])):
+	for i in range(len(colour_demand[0])-1):
 		assigned_clients.append(False)
-	for i in range(len(colour_demand[0])):
+	for i in range(len(colour_demand[0])-1):
 		if assigned_clients[i] == False:
-			if any(new_Xc[i][c][l][m] > 0.0 for m in range(num_bands)) and assigned_demand[l][c] + colour_demand[0][i] <= facility_cap[l]:
+			if any(new_Xc[i][c][l][m] > 0.0 for m in range(num_bands)) and assigned_demand[l][c] + colour_demand[0][i] <= facility_cap[l] and assigned_demand[l][c] + colour_demand[0][i] <= 46000:
 				int_Xc[i][c][l] = 1.0
 				assigned_clients[i] = True
 				assigned_demand[l][c] = assigned_demand[l][c] + colour_demand[0][i]
-	for i in range(len(colour_demand[0])):
+	for i in range(len(colour_demand[0])-1):
 		if assigned_clients[i] == False:
 			for l in range(num_types):
 				for c in range(num_copies):
-					if assigned_demand[l][c] > 0 and assigned_demand[l][c] + colour_demand[0][i] <= facility_cap[l]:
+					if assigned_demand[l][c] > 0 and assigned_demand[l][c] + colour_demand[0][i] <= facility_cap[l] and assigned_demand[l][c] + colour_demand[0][i] <= 46000:
 						int_Xc[i][c][l] = 1.0
 						assigned_clients[i] = True
 						assigned_demand[l][c] = assigned_demand[l][c] + colour_demand[0][i]
 		if assigned_clients[i] == False:
 			for l in range(num_types):
 				for c in range(num_copies):
-					if assigned_demand[l][c] + colour_demand[0][i] <= facility_cap[l]:
+					if assigned_demand[l][c] + colour_demand[0][i] <= facility_cap[l] and assigned_demand[l][c] + colour_demand[0][i] <= 46000:
 						int_Xc[i][c][l] = 1.0
 						assigned_demand[l][c] = assigned_demand[l][c] + colour_demand[0][i]
 						assigned_clients[i] = True
 
-	for i in range(len(colour_demand[0])):
+	for i in range(len(colour_demand[0])-1):
 		sum_i = 0
 		for l in range(num_types):
 			for c in range(num_copies):
@@ -754,7 +751,7 @@ while(running == True):
 			for m in range(num_bands):
 				if any(int_Xbw[i][c][l] == 1.0 for i in range(len(bw_demand[0]))):
 						assigned_demand[l][c][0] = assigned_demand[l][c][0] + bw_demand[0][i]
-				if any(int_Xc[i][c][l] == 1.0 for i in range(len(colour_demand[0]))):
+				if any(int_Xc[i][c][l] == 1.0 for i in range(len(colour_demand[0])-1)):
 						assigned_demand[l][c][1] = assigned_demand[l][c][1] + colour_demand[0][i]
 	ss_service = 0
 	for l in range(num_types):
@@ -799,8 +796,6 @@ singlestage_cost = ss_service + ss_setup
 print("------------------------------------------------------------------")
 print(("Filtering Solution (before LS) for a = "+str(round(alpha,2))+": "+str(round(singlestage_cost,2)))+" in "+str(round(end_model - start_model,2))+" seconds")
 print("------------------------------------------------------------------")
-
-
 
 
 used_types = []
